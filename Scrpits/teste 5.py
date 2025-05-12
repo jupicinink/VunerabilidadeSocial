@@ -1,30 +1,56 @@
+from pathlib import Path
 import pandas as pd
-import numpy as np
+pasta_csv = Path(r"C:\Users\c23418\OneDrive - Bruning Tecnometal Ltda\Documentos\PI2025\Arquivos\csv")
 
+# === 1. Ler dados censitários ===
+domicilios = pd.read_csv(pasta_csv /"Censo 2022 - Características dos domicílios - Porto Alegre (RS).csv", sep=';', encoding='utf-8')
+favela = pd.read_csv(pasta_csv /"Censo 2022 - População residente em favelas - Porto Alegre (RS).csv", sep=';', encoding='utf-8')
+instru = pd.read_csv(pasta_csv /"Censo 2022 - Nível de instrução - Porto Alegre (RS).csv", sep=';', encoding='utf-8')
+territorio = pd.read_csv(pasta_csv /"Censo 2022 - Território - Porto Alegre (RS).csv", sep=';', encoding='utf-8')
 
-n = 100
+# === 2. Converter strings com vírgula para float ===
+def conv_percent(valor):
+    return float(valor.replace(',', '.'))
 
+domicilios["Não possui(%)"] = domicilios["Não possui(%)"].apply(conv_percent)
+favela["Percentual"] = favela["Percentual"].apply(conv_percent)
 
-np.random.seed(42) 
+# === 3. Extrair indicadores relevantes ===
+sem_esgoto = domicilios.loc[domicilios["Característica"] == "Conectados à rede de esgoto", "Não possui(%)"].values[0]
+sem_agua = domicilios.loc[domicilios["Característica"] == "Abastecidos pela rede geral de água", "Não possui(%)"].values[0]
+pop_favela = favela.loc[favela["Situação"] == "Em favelas", "Percentual"].values[0]
+pop_sem_instrucao = instru.loc[instru["Nível de instrução"] == "Sem instrução e fundamental incompleto", "População (pessoas)"].values[0]
 
-dados = pd.DataFrame({
-    "ID_SETOR": [f"{i:04d}" for i in range(n)],
-    "renda_media": np.random.normal(loc=1800, scale=800, size=n).astype(int),
-    "sem_esgoto_percent": np.random.uniform(0, 80, size=n).round(1),
-    "em_area_de_risco": np.random.choice([True, False], size=n, p=[0.3, 0.7])
-})
+# === 4. Total da população (calculado a partir do nível de instrução) ===
+total_pop = instru["População (pessoas)"].sum()
+percentual_sem_instrucao = round((pop_sem_instrucao / total_pop) * 100, 2)
 
+# === 5. Juntar dados em um dataframe resumo ===
+dados = {
+    "Município": ["Porto Alegre"],
+    "Código do Município": [4314902],
+    "% Sem esgoto": [sem_esgoto],
+    "% Sem água encanada": [sem_agua],
+    "% Em favelas": [pop_favela],
+    "% Sem instrução/fund. incompleto": [percentual_sem_instrucao],
+    "Densidade hab/km²": [territorio["Densidade demográfica(hab/km²)"].values[0]]
+}
 
-dados["renda_media"] = dados["renda_media"].apply(lambda x: max(x, 300))
+df_vulnerabilidade = pd.DataFrame(dados)
 
-# Aplicar critérios de vulnerabilidade
-dados["vulneravel"] = (
-    (dados["renda_media"] < 1100) &
-    (dados["sem_esgoto_percent"] > 30) &
-    (dados["em_area_de_risco"])
-).astype(int)
+# === 6. Carregar os dados de risco (convertidos para CSV) ===
+inundacao = pd.read_csv(pasta_csv /"inundacao_atributos.csv", encoding="latin1")
+corrida = pd.read_csv(pasta_csv /"Corrida_de_Massa_Área.csv", encoding="latin1")
+enxurrada = pd.read_csv(pasta_csv / "Enxurrada_Área.shp.csv", encoding="latin1")
+risco_geo = pd.read_csv(pasta_csv /"risco_geologico_porto_alegre.csv", encoding="latin1")
 
+# Contagem total de registros de risco (linhas)
+total_riscos = len(inundacao) + len(corrida) + len(enxurrada) + len(risco_geo)
 
-dados.to_csv("dados_vulnerabilidade_sinteticos.csv", index=False)
+# Adicionar ao dataframe final
+df_vulnerabilidade["Nº total de áreas de risco mapeadas"] = total_riscos
 
-print("CSV gerado com sucesso: dados_vulnerabilidade_sinteticos.csv")
+# === 7. Exportar o resultado ===
+df_vulnerabilidade.to_csv(pasta_csv /"resumo_vulnerabilidade_risco_porto_alegre.csv", index=False, encoding="latin1")
+
+print("✅ Análise gerada com sucesso. Veja: resumo_vulnerabilidade_risco_porto_alegre.csv")
