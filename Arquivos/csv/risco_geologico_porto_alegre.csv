@@ -1,0 +1,11 @@
+codigo_setor,grau_de_risco,tipologia,logradouro,numero_imoveis_aprox,numero_pessoas_aprox
+RS_PORTOAL_SR_01_CPRM,Alto,Inundação,"Travessa do Espigão, Bairro Lami",345,1380
+RS_PORTOAL_SR_02_CPRM,Alto,Inundação,"Rua A, Loteamento Jardim Floresta, Bairro Extrema",503,2011
+RS_PORTOAL_SR_03_CPRM,Alto,Deslizamento planar,"Rua 7, Bairro Pitinga",18,72
+RS_PORTOAL_SR_04_CPRM,Alto,"Enxurrada, Erosão de margem fluvial","Estrada João Antônio Silveira, Bairro Pitinga",59,236
+RS_PORTOAL_SR_05_CPRM,Alto,"Erosão de margem fluvial, Enxurrada","Rua T, Rincão da Lagoa, Bairro Restinga",1,4
+RS_PORTOAL_SR_06_CPRM,Alto,Inundação,"Acesso Um a partir da Rua Bispo Marino Prudencio Moreira, Bairro Restinga",103,412
+RS_PORTOAL_SR_07_CPRM,Alto,"Enxurrada, Erosão de margem fluvial, Inundação","Alameda C, Bairro Restinga",65,260
+RS_PORTOAL_SR_08_CPRM,Muito Alto,"Enxurrada, Erosão de margem fluvial","Rua Tim Lopes e Rua F, Bairro Restinga",101,404
+RS_PORTOAL_SR_09_CPRM,Alto,Inundação,"Avenida Juca Batista, Ponte da Gabiroba, Bairro Hípica",357,1428
+RS_PORTOAL_SR_10_CPRM,Alto,Inundação,"Rua Dorival Castilhos Machado, Bairro Hípica",351,1404
